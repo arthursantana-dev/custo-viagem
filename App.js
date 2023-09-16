@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import {
 	StyleSheet,
 	SafeAreaView,
@@ -8,16 +7,25 @@ import {
 	View,
 	TouchableHighlight,
 } from "react-native";
-// import {NavigationContainer} from '@react-navigation/native';
 import { useState } from "react";
 import { Pedagio } from "./model/Pedagio";
 import PaginaInicial from "./components/PaginaInicial"
 import ListaPedagios from "./components/ListaPedagios";
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from "@react-navigation/native-stack";
+
+const Stack = createNativeStackNavigator()
 
 export default function App() {
-	return (<View>
-		<PaginaInicial />
-	</View>)
+	return(
+		<NavigationContainer>
+		 	<Stack.Navigator initialRouteName="PaginaInicial">
+		 		<Stack.Screen name="PaginaInicial" component={PaginaInicial}/>
+		 		 <Stack.Screen name="ListaPedagios" component={ListaPedagios}/>
+		 	</Stack.Navigator>
+		</NavigationContainer>
+	)
+
 }
 
 const styles = StyleSheet.create({

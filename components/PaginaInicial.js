@@ -1,4 +1,5 @@
 import {
+	Alert,
 	StyleSheet,
 	SafeAreaView,
 	Button,
@@ -10,7 +11,7 @@ import {
 import { useState } from "react";
 import { Pedagio } from "../model/Pedagio";
 
-export default function PaginaInicial() {
+export default function PaginaInicial({ navigation }) {
 	const [origem, setOrigem] = useState("");
 	const [destino, setDestino] = useState("");
 
@@ -24,52 +25,122 @@ export default function PaginaInicial() {
 
 	function handleAdicionarPedagio() {
 		const pedagio = new Pedagio(valorPedagio)
+		setValorPedagio(0)
 		setlistaPedagios([...listaPedagios, pedagio])
+
+	}
+
+	function handleIrParaListaPedagios() {
+		navigation.navigate('ListaPedagios', {
+			listaPedagios: listaPedagios,
+			somarPedagios: somarPedagios
+		})
+	}
+
+	function handleLimparEntradas() {
+		Alert.alert("Limpar Dados", "Deseja mesmo limpar todos os dados?", [
+			{text: "Sim", onPress: () => {
+				setOrigem("")
+				setDestino("")
+				setDistancia(0)
+				setConsumo(0)
+				setValorCombustivel(0)
+				setValorPedagio(0)
+			}},
+			{text: "Não"}
+		])
+	}
+
+	function somarPedagios(lista) {
+		let total = 0
+
+		lista.map((pedagio) => {
+			total += parseFloat(pedagio.valor)
+		})
+
+		return total
+	}
+
+	function handleCalcularCusto() {
+		const litrosConsumidos = distancia * consumo
+		const valorLitrosConsumidos = litrosConsumidos * valorCombustivel
+		const valorTotal = valorLitrosConsumidos + somarPedagios(listaPedagios)
+
+		Alert.alert("Custo da Viagem", `Sua viagem de ${origem} até ${destino}, que tem ${distancia}km, custará R$${parseFloat(valorTotal).toFixed(2)}`, ["OK"])
 	}
 
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.horizontalContainer}>
 				<Text style={styles.label}>Origem: </Text>
-				<TextInput style={styles.textInput} placeholder={"São Paulo"} onChangeText={(v) => setOrigem(v)} />
+				<TextInput
+					style={styles.textInput}
+					placeholder={"São Paulo"}
+					value={origem}
+					onChangeText={(v) => setOrigem(v)}
+				/>
 			</View>
 			<View style={styles.horizontalContainer}>
 				<Text style={styles.label}>Destino: </Text>
-				<TextInput style={styles.textInput} placeholder={"Curitiba"} onChangeText={(e) => { setDestino(e) }} />
+				<TextInput
+					style={styles.textInput}
+					placeholder={"Curitiba"}
+					value={destino}
+					onChangeText={(e) => { setDestino(e) }}
+				/>
 			</View>
 			<Text style={styles.title}>Consumo Carro</Text>
 			<View style={styles.horizontalContainer}>
 				<Text style={styles.label}>Distância: </Text>
-				<TextInput style={styles.textInput} placeholder={"200"} onChangeText={(e) => { setDistancia(e) }} />
+				<TextInput
+					value={distancia}
+					style={styles.textInput}
+					placeholder={"200"}
+					onChangeText={(e) => { setDistancia(e) }}
+				/>
 			</View>
 			<View style={styles.horizontalContainer}>
 				<Text style={styles.label}>Consumo (km/l): </Text>
-				<TextInput style={styles.textInput} placeholder={"4"} onChangeText={(e) => { setConsumo(e) }} />
+				<TextInput
+					value={consumo}
+					style={styles.textInput}
+					placeholder={"4"}
+					onChangeText={(e) => { setConsumo(e) }}
+				/>
 			</View>
 			<View style={styles.horizontalContainer}>
 				<Text style={styles.label}>Valor do Combustível: </Text>
-				<TextInput style={styles.textInput} placeholder={"5.67"} onChangeText={(e) => { setValorCombustivel(e) }} />
+				<TextInput
+					value={valorCombustivel}
+					style={styles.textInput}
+					placeholder={"5.67"}
+					onChangeText={(e) => { setValorCombustivel(e) }}
+				/>
 			</View>
 			<Text style={styles.title}>Pedágio</Text>
 			<View style={styles.horizontalContainer}>
 				<Text style={styles.label}>Valor: </Text>
-				<TextInput style={styles.textInput} onChangeText={valor => setValorPedagio(valor)} />
-				<TouchableHighlight style={styles.button} onPress={() => handleAdicionarPedagio()}>
+				<TextInput 
+					style={styles.textInput} 
+					value={valorPedagio} 
+					onChangeText={valor => setValorPedagio(valor)} 
+				/>
+				<TouchableHighlight
+					style={styles.button}
+					onPress={() => { handleAdicionarPedagio() }}>
 					<Text style={styles.buttonText}>Adicionar</Text>
 				</TouchableHighlight>
 			</View>
 			<View style={styles.horizontalContainer}>
-				<TouchableHighlight style={[styles.button, { flex: 1 }]} onPress={() => {
-
-				}}>
+				<TouchableHighlight style={[styles.button, { flex: 1 }]} onPress={() => handleIrParaListaPedagios()}>
 					<Text style={[styles.buttonText, { textAlign: 'center' }]}>Lista</Text>
 				</TouchableHighlight>
 			</View>
 			<View style={[styles.horizontalContainer, { gap: 4 }]}>
-				<TouchableHighlight style={[styles.button, { flex: 3 }]}>
+				<TouchableHighlight style={[styles.button, { flex: 3 }]} onPress={() => handleCalcularCusto()}>
 					<Text style={styles.buttonText}>Calcular</Text>
 				</TouchableHighlight>
-				<TouchableHighlight style={[styles.button, { flex: 1 }]}>
+				<TouchableHighlight style={[styles.button, { flex: 1 }]} onPress={() => handleLimparEntradas()}>
 					<Text style={styles.buttonText}>Limpar</Text>
 				</TouchableHighlight>
 			</View>
